@@ -1,1 +1,1 @@
-![Weather-info-service flow](https://drive.google.com/file/d/13PQNg9_VHX_h-qgIn6GUc_Mc1FHTTnG8/view?usp=sharing)
+![Weather-info-service flow](src/main/resources/flow_diagram.png)
