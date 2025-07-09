@@ -1,5 +1,6 @@
-package com.weather.info;
+package com.weather.info.service.impl;
 
+import com.weather.info.AbstractTest;
 import com.weather.info.entity.CoordinatesEntity;
 import com.weather.info.entity.PincodeEntity;
 import com.weather.info.exception.ResourceNotFoundException;

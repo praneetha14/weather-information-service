@@ -24,7 +24,7 @@ public class WeatherServiceImpl implements WeatherService {
     private final PincodeRepository pincodeRepository;
     private final OpenWeatherService openWeatherService;
 
-    private static double kelvinToDegree(double temperature) {
+    private double toCelcius(double temperature) {
         return temperature - 273.15;
     }
 
@@ -68,10 +68,11 @@ public class WeatherServiceImpl implements WeatherService {
     }
 
     private WeatherResponseVO toWeatherResponseVO(WeatherEntity weatherEntity, long pincode) {
-        return new WeatherResponseVO(pincode, weatherEntity.getTemperature(), weatherEntity.getCondition(),
-                weatherEntity.getDescription(), weatherEntity.getFeelsLike(), weatherEntity.getMinTemp(),
-                weatherEntity.getMaxTemp(), weatherEntity.getPressure(), weatherEntity.getHumidity(),
-                weatherEntity.getWindSpeed(), weatherEntity.getWindDirection());
+        return new WeatherResponseVO(weatherEntity.getDate(), pincode, toCelcius(weatherEntity.getTemperature()),
+                weatherEntity.getCondition(), weatherEntity.getDescription(), toCelcius(weatherEntity.getFeelsLike()),
+                toCelcius(weatherEntity.getMinTemp()), toCelcius(weatherEntity.getMaxTemp()),
+                weatherEntity.getPressure(), weatherEntity.getHumidity(), weatherEntity.getWindSpeed(),
+                weatherEntity.getWindDirection());
     }
 
     private WeatherEntity toEntity(OpenWeatherResponseVO openWeatherResponseVO) {
@@ -101,6 +102,8 @@ public class WeatherServiceImpl implements WeatherService {
         CoordinatesEntity coordinatesEntity = toCoordinatesEntity(coordinatesResponseVO);
         PincodeEntity pincodeEntity = new PincodeEntity();
         pincodeEntity.setPincode(pincode);
+        pincodeEntity.setPlace(coordinatesResponseVO.getName());
+        pincodeEntity.setCountry(coordinatesResponseVO.getCountry());
         pincodeEntity.setCoordinatesEntity(coordinatesEntity);
         return pincodeRepository.save(pincodeEntity);
     }
