@@ -12,6 +12,11 @@ import org.springframework.web.util.UriComponentsBuilder;
 import static com.weather.info.model.open.weather.utils.OpenWeatherEndpoints.GEO_CODING_URL;
 import static com.weather.info.model.open.weather.utils.OpenWeatherEndpoints.WEATHER_URL;
 
+
+/**
+ * OpenWeatherClient is a client class which has methods that internally use RestTemplate to communicate and fetch data
+ * from OpenWeatherAPI
+ */
 @RequiredArgsConstructor
 @Slf4j
 public class OpenWeatherClient {

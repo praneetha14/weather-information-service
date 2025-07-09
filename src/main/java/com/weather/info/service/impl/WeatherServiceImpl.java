@@ -17,11 +17,29 @@ import lombok.RequiredArgsConstructor;
 import java.time.LocalDate;
 import java.util.Optional;
 
+/**
+ *       WeatherServiceImpl is a concrete implementation of WeatherService interface and provides implementation of the
+ *       methods in WeatherService.
+ */
 @RequiredArgsConstructor
 public class WeatherServiceImpl implements WeatherService {
 
+    /**
+     * weatherRepository is a bean of type WeatherRepository which is a JPARepository using which we perform db
+     * operations on WeatherEntity
+     */
     private final WeatherRepository weatherRepository;
+
+    /**
+     * pincodeRepository is a bean of type PincodeRepository which is a JPARepository using which we perform db
+     * operations on PincodeEntity
+     */
     private final PincodeRepository pincodeRepository;
+
+    /**
+     * openWeatherService is a bean of type OpenWeatherService which has methods related to fetching weather information
+     * from OpenWeatherAPI
+     */
     private final OpenWeatherService openWeatherService;
 
     private double toCelcius(double temperature) {
