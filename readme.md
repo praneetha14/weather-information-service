@@ -38,4 +38,4 @@ This microservice is built using these technologies
 ![code-coverage-report](src/main/resources/code_coverage.png)
 
 **Want to walk through JavaDoc documentation of the service?🤔**
-+ **Clone the repository and just run './gradlew javadoc'**
++ Clone the repository and just run **'./gradlew javadoc'** and open build/docs/javadoc/index.html
