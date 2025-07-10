@@ -1,0 +1,10 @@
+spring:
+  datasource:
+    url: jdbc:h2:mem:automobile_management_system;MODE=MYSQL
+    username: sa
+    password:
+    driver-class-name: org.h2.Driver
+weather:
+  info:
+    openweather:
+      app-id: ${OPEN_WEATHER_APP_ID:1234}
