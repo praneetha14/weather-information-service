@@ -1,0 +1,94 @@
+name: Coverage & Badge
+
+on:
+  pull_request:
+  push:
+    branches:
+      - master
+
+jobs:
+  coverage:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write        # for pushing to badges branch
+      pull-requests: write   # for commenting coverage on PR
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v1
+        with:
+          java-version: 17
+
+      - name: Install XML tools (for badge generation)
+        if: github.ref == 'refs/heads/master'
+        run: sudo apt-get install -y libxml2-utils
+
+      - name: Run Tests and Generate Coverage
+        run: |
+          chmod +x ./gradlew
+          ./gradlew test jacocoTestReport
+
+      - name: Report Coverage on PR
+        if: github.event_name == 'pull_request'
+        uses: madrapps/jacoco-report@v1.7.2
+        with:
+          paths: |
+            ${{ github.workspace }}/**/build/reports/jacoco/test/jacocoTestReport.xml
+          token: ${{ secrets.GITHUB_TOKEN }}
+          min-coverage-overall: 80
+          min-coverage-changed-files: 80
+
+      - name: Extract Coverage Percentage
+        if: github.ref == 'refs/heads/master'
+        id: extract
+        run: |
+          COVERED=$(xmllint --xpath "string(//report/counter[@type='INSTRUCTION']/@covered)" build/reports/jacoco/test/jacocoTestReport.xml)
+          MISSED=$(xmllint --xpath "string(//report/counter[@type='INSTRUCTION']/@missed)" build/reports/jacoco/test/jacocoTestReport.xml)
+          TOTAL=$((COVERED + MISSED))
+          PERCENT=$((100 * COVERED / TOTAL))
+          echo "COVERAGE_PERCENT=$PERCENT" >> $GITHUB_OUTPUT
+
+      - name: Generate SVG Badge
+        if: github.ref == 'refs/heads/master'
+        run: |
+          PERCENT=${{ steps.extract.outputs.COVERAGE_PERCENT }}
+          COLOR=red
+          if [ "$PERCENT" -ge 90 ]; then COLOR=brightgreen
+          elif [ "$PERCENT" -ge 75 ]; then COLOR=yellowgreen
+          elif [ "$PERCENT" -ge 50 ]; then COLOR=orange
+          fi
+
+          echo "<svg xmlns='http://www.w3.org/2000/svg' width='120' height='20'>
+            <linearGradient id='a' x2='0' y2='100%%'>
+              <stop offset='0' stop-color='#bbb' stop-opacity='.1'/>
+              <stop offset='1' stop-opacity='.1'/>
+            </linearGradient>
+            <rect rx='3' width='120' height='20' fill='#555'/>
+            <rect rx='3' x='60' width='60' height='20' fill='$COLOR'/>
+            <path fill='$COLOR' d='M60 0h4v20h-4z'/>
+            <rect rx='3' width='120' height='20' fill='url(#a)'/>
+            <g fill='#fff' text-anchor='middle'
+              font-family='Verdana,Geneva,DejaVu Sans,sans-serif' font-size='11'>
+              <text x='30' y='15'>coverage</text>
+              <text x='90' y='15'>$PERCENT%</text>
+            </g>
+          </svg>" > coverage.svg
+
+      - name: Upload badge to `badges` branch
+        if: github.ref == 'refs/heads/master'
+        run: |
+          git config --global user.name "github-actions"
+          git config --global user.email "github-actions@github.com"
+
+          # Create local worktree to avoid switching HEAD
+          git fetch origin badges || echo "No badges branch yet"
+          git worktree add badges_branch badges
+
+          cd badges
+          mv ../coverage.svg coverage.svg
+          git add coverage.svg
+          git commit -m "Update coverage badge [skip ci]" || echo "No changes to commit"
+          git push origin HEAD:badges
