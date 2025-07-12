@@ -15,3 +15,7 @@ weather:
   info:
     openweather:
       app-id: ${OPEN_WEATHER_APP_ID}
+    application:
+      base-url: http://localhost:${server.port}
+server:
+  port: 8080
