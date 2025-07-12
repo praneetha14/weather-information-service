@@ -38,6 +38,3 @@ This microservice is built using these technologies
 
 **Code Coverage report generated using Jacoco**📄
 ![code-coverage-report](src/main/resources/code_coverage.png)
-
-**Want to walk through JavaDoc documentation of the service?🤔** 
-![javadoc](https://praneetha14.github.io/weather-information-service/javadoc/)
