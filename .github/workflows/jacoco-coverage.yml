@@ -83,12 +83,18 @@ jobs:
           git config --global user.name "github-actions"
           git config --global user.email "github-actions@github.com"
 
-          # Create local worktree to avoid switching HEAD
-          git fetch origin badges || echo "No badges branch yet"
+          # Clean worktree directory
+          rm -rf badges_branch
+
+          # Create a new worktree for the badges branch
+          git fetch origin badges || git branch badges
           git worktree add badges_branch badges
 
-          cd badges
-          mv ../coverage.svg coverage.svg
+          # Move SVG into the worktree and commit it
+          mv coverage.svg badges_branch/coverage.svg
+          cd badges_branch
+
           git add coverage.svg
           git commit -m "Update coverage badge [skip ci]" || echo "No changes to commit"
           git push origin HEAD:badges
+      
