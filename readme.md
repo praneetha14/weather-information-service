@@ -1,4 +1,5 @@
 # Fetch weather API ☁️
+[![Javadoc](https://img.shields.io/badge/JavaDoc-Online-green)](https://praneetha14.github.io/weather-information-service/javadoc/)
 This github repository is Spring boot microservice which has an API
 that shows weather condition for a given date and given pincode.
 
@@ -37,5 +38,5 @@ This microservice is built using these technologies
 **Code Coverage report generated using Jacoco**📄
 ![code-coverage-report](src/main/resources/code_coverage.png)
 
-**Want to walk through JavaDoc documentation of the service?🤔**
-+ Clone the repository and just run **'./gradlew javadoc'** and open build/docs/javadoc/index.html
+**Want to walk through JavaDoc documentation of the service?🤔** 
+![javadoc](https://praneetha14.github.io/weather-information-service/javadoc/)
