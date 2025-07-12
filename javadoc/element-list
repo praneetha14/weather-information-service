@@ -1,0 +1,13 @@
+com.weather.info
+com.weather.info.client
+com.weather.info.entity
+com.weather.info.exception
+com.weather.info.model
+com.weather.info.model.enums
+com.weather.info.model.open.weather
+com.weather.info.model.open.weather.utils
+com.weather.info.properties
+com.weather.info.repository
+com.weather.info.rest.v1
+com.weather.info.service
+com.weather.info.service.impl
