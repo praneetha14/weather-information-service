@@ -7,15 +7,16 @@ that shows weather condition for a given date and given pincode.
 
 **NOTE**
 + This API gives weather information for a given date if 
-  + The weather information for the given date is present in system
+  + The weather information for the given date is present in system(Database or Redis Cache)
   + Or if the given date is not older or greater than the current date then it calls open weather API, fetches weather information 
-    for current date, saves it and gives it in response. 
+    for current date, saves it(in Database + Redis Cache) and gives it in response. 
   + Else it will show weather details not present.
 
 This microservice is built using these technologies
 + **JAVA 17**
 + **Spring boot 3.5.3**
 + **MySQL 8**
++ **Redis(for caching weather data and reducing external API calls)
 + **Gradle 8.14.2**
 
 **Weather API FLOW DIAGRAM**
@@ -29,7 +30,9 @@ This microservice is built using these technologies
   + export your MySQL database username into MYSQL_DATABASE_USER variable or else 'root' is considered default
   + export your MySQL database password into MYSQL_DATA_BASE_PASSWORD variable. Make sure you export this or else you 
     won't be able to run the application.
-  + Also make sure your localhost port 8080 is free, if not feel free to change the port of application by adding different value to server.port in application.properties or application.yml
+  + export your Redis host into REDIS_HOST variable or else 'localhost' is considered default
+  + export your Redis port into REDIS_PORT variable or else 6379 is considered default
+  + Also make sure your localhost port 8080 is free, if not, feel free to change the port of application by adding different value to server.port in application.properties or application.yml
   + Get an API key by logging in to https://openweathermap.org portal from your accounts section.
   + export the API key you got from OpenWeatherMaps into OPEN_WEATHER_APP_ID variable.
   + That's it you will be able to run the application successfully.

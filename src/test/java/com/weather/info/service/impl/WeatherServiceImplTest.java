@@ -8,16 +8,26 @@ import com.weather.info.model.WeatherResponseVO;
 import com.weather.info.model.enums.SupportedDatePatterns;
 import com.weather.info.model.open.weather.OpenWeatherCoordinatesResponseVO;
 import com.weather.info.model.open.weather.OpenWeatherResponseVO;
+import com.weather.info.redis.service.WeatherCacheService;
 import com.weather.info.repository.PincodeRepository;
 import com.weather.info.service.WeatherService;
+import lombok.extern.slf4j.Slf4j;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.data.redis.connection.RedisConnectionFactory;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.ValueOperations;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.web.client.RestTemplate;
 
+import java.security.Key;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -39,8 +49,19 @@ public class WeatherServiceImplTest extends AbstractTest {
     @Autowired
     private PincodeRepository pincodeRepository;
 
-    @MockBean
+    @Autowired
+    private WeatherCacheService weatherCacheService;
+
+    @MockitoBean
     private RestTemplate restTemplate;
+
+    @MockitoBean
+    private ValueOperations<String, Object> valueOperations;
+
+    @MockitoBean
+    private RedisTemplate<String, Object> redisTemplate;
+
+
 
     @Test
     void getWeatherInformationSuccessTest() {
@@ -51,6 +72,8 @@ public class WeatherServiceImplTest extends AbstractTest {
                 .thenReturn(createOpenWeatherCoordinatesResponseVO());
         when(restTemplate.getForObject(anyString(), eq(OpenWeatherResponseVO.class)))
                 .thenReturn(createOpenWeatherResponseVO());
+        when(redisTemplate.opsForValue()).thenReturn(valueOperations);
+        when(valueOperations.get(anyString())).thenReturn(null);
         WeatherResponseVO weatherResponseVO = weatherService.getWeatherInformation(pincode, date);
         assertNotNull(weatherResponseVO);
     }
@@ -66,7 +89,8 @@ public class WeatherServiceImplTest extends AbstractTest {
 
         when(restTemplate.getForObject(anyString(), eq(OpenWeatherResponseVO.class)))
                 .thenReturn(createOpenWeatherResponseVO());
-
+        when(redisTemplate.opsForValue()).thenReturn(valueOperations);
+        when(valueOperations.get(anyString())).thenReturn(null);
         WeatherResponseVO weatherResponseVO = weatherService.getWeatherInformation(pincodeEntity.getPincode(), date);
         assertNotNull(weatherResponseVO);
     }
@@ -74,11 +98,14 @@ public class WeatherServiceImplTest extends AbstractTest {
     @Test
     void getWeatherInformationForExistingWeatherSuccessTest() {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
+        LocalDate localDate = LocalDate.now();
         String date = LocalDate.now().format(formatter);
         PincodeEntity pincodeEntity = getPincodeEntity();
         CoordinatesEntity coordinatesEntity = getCoordinatesEntity();
         pincodeEntity.setCoordinatesEntity(coordinatesEntity);
         pincodeRepository.save(pincodeEntity);
+        when(redisTemplate.opsForValue()).thenReturn(valueOperations);
+        when(valueOperations.get(anyString())).thenReturn(getWeatherResponseVO(localDate, pincodeEntity.getPincode()));
         when(restTemplate.getForObject(anyString(), eq(OpenWeatherResponseVO.class)))
                 .thenReturn(createOpenWeatherResponseVO());
         weatherService.getWeatherInformation(pincodeEntity.getPincode(), date);
@@ -105,6 +132,8 @@ public class WeatherServiceImplTest extends AbstractTest {
         pincodeRepository.save(pincodeEntity);
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
         String date = LocalDate.now().minusDays(1).format(formatter);
+        when(redisTemplate.opsForValue()).thenReturn(valueOperations);
+        when(valueOperations.get(anyString())).thenReturn(null);
         Throwable exception = assertThrows(ResourceNotFoundException.class,
                 () -> weatherService.getWeatherInformation(pincodeEntity.getPincode(), date));
         assertNotNull(exception);
@@ -127,6 +156,8 @@ public class WeatherServiceImplTest extends AbstractTest {
     void getWeatherInformationWithErrorWhileCallingCoordinateAPIFailureTest() {
         long pincode = 122017;
         String date = LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-yyyy"));
+        when(redisTemplate.opsForValue()).thenReturn(valueOperations);
+        when(valueOperations.get(anyString())).thenReturn(null);
         when(restTemplate.getForObject(anyString(), eq(OpenWeatherCoordinatesResponseVO.class)))
                 .thenThrow(new RuntimeException("Error while fetching coordinates"));
         Throwable exception = assertThrows(RuntimeException.class,
@@ -139,6 +170,8 @@ public class WeatherServiceImplTest extends AbstractTest {
     void getWeatherInformationWithErrorWhileCallingWeatherAPIFailureTest() {
         long pincode = 122017;
         String date = LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-yyyy"));
+        when(redisTemplate.opsForValue()).thenReturn(valueOperations);
+        when(valueOperations.get(anyString())).thenReturn(null);
         when(restTemplate.getForObject(anyString(), eq(OpenWeatherCoordinatesResponseVO.class)))
                 .thenReturn(createOpenWeatherCoordinatesResponseVO());
         when(restTemplate.getForObject(anyString(), eq(OpenWeatherResponseVO.class)))
@@ -147,6 +180,37 @@ public class WeatherServiceImplTest extends AbstractTest {
                 () -> weatherService.getWeatherInformation(pincode, date));
         assertNotNull(exception);
         assertEquals(FETCHING_WEATHER_ERROR_MESSAGE, exception.getMessage());
+    }
+
+    @Test
+    void saveWeatherInfoToRedisSuccessTest() {
+        long pincode = 122017;
+        LocalDate localDate = LocalDate.now();
+        String date = LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-yyyy"));
+        WeatherResponseVO weatherResponseVO = new WeatherResponseVO(localDate, pincode,30, "Cloudy", "Rainy",
+                31, 28, 32, 14, 25, 22, 15);
+        long ttl = 10L;
+        TimeUnit timeUnit = TimeUnit.HOURS;
+        when(redisTemplate.opsForValue()).thenReturn(valueOperations);
+        when(redisTemplate.opsForValue().get(ttl)).thenReturn(weatherResponseVO);
+        assertDoesNotThrow(() -> weatherCacheService.saveWeatherInfo(redisTemplate.randomKey(), weatherResponseVO, ttl, timeUnit));
+    }
+
+    @Test
+    void getWeatherInfoFromRedisSuccessTest() {
+        long pincode = 122017;
+        LocalDate localDate = LocalDate.now();
+        String date = localDate.format(DateTimeFormatter.ofPattern("dd-MM-yyyy"));
+        when(redisTemplate.opsForValue()).thenReturn(valueOperations);
+        when(valueOperations.get(anyString())).thenReturn(getWeatherResponseVO(localDate, pincode));
+        WeatherResponseVO weatherResponseVO = weatherService.getWeatherInformation(pincode, date);
+        assertNotNull(weatherResponseVO);
+    }
+
+    private WeatherResponseVO getWeatherResponseVO(LocalDate localDate, long pincode) {
+        return new WeatherResponseVO(localDate, pincode, 27,
+                "Sunny", "thunder storm", 28, 23, 28,
+                10, 10, 10, 10);
     }
 
     private OpenWeatherResponseVO createOpenWeatherResponseVO() {
