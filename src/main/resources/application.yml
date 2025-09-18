@@ -4,13 +4,19 @@ spring:
   datasource:
     username: ${MYSQL_DATABASE_USER:root}
     password: ${MYSQL_DATABASE_PASSWORD}
-    driver-class-name: com.mysql.jdbc.Driver
+    driver-class-name: com.mysql.cj.jdbc.Driver
     url: jdbc:mysql://${MYSQL_DATABASE_HOST:localhost}:3306/${MYSQL_DATABASE_NAME:weather_info_svc}?createDatabaseIfNotExist=true&useSSL=false&allowPublicKeyRetrieval=true
   jpa:
     hibernate:
       ddl-auto: update
   profiles:
     active: local
+  cache:
+    type: redis
+  data:
+    redis:
+      host: ${REDIS_HOST:localhost}
+      port: ${REDIS_PORT:6379}
 weather:
   info:
     openweather:

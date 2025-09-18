@@ -3,6 +3,7 @@ package com.weather.info;
 import com.weather.info.client.OpenWeatherClient;
 import com.weather.info.properties.ApplicationProperties;
 import com.weather.info.properties.OpenWeatherConfigProperties;
+import com.weather.info.redis.service.Impl.WeatherCacheServiceImpl;
 import com.weather.info.repository.PincodeRepository;
 import com.weather.info.repository.WeatherRepository;
 import com.weather.info.service.OpenWeatherService;
@@ -15,6 +16,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.data.redis.connection.RedisConnectionFactory;
+import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.List;
@@ -44,8 +48,8 @@ public class WeatherInfoAutoConfiguration {
 
     @Bean
     public WeatherService weatherService(WeatherRepository weatherRepository, PincodeRepository pincodeRepository,
-                                         OpenWeatherService openWeatherService) {
-        return new WeatherServiceImpl(weatherRepository, pincodeRepository, openWeatherService);
+                                         OpenWeatherService openWeatherService, WeatherCacheServiceImpl weatherCacheServiceImpl) {
+        return new WeatherServiceImpl(weatherRepository, pincodeRepository, openWeatherService, weatherCacheServiceImpl);
     }
 
     @Bean
@@ -55,4 +59,20 @@ public class WeatherInfoAutoConfiguration {
         return openAPI;
     }
 
+    @Bean
+    public RedisConnectionFactory redisConnectionFactory() {
+        return new LettuceConnectionFactory();
+    }
+
+    @Bean
+    public RedisTemplate<String, Object> redisTemplate(RedisConnectionFactory redisConnectionFactory) {
+        RedisTemplate<String, Object> redisTemplate = new RedisTemplate<>();
+        redisTemplate.setConnectionFactory(redisConnectionFactory);
+        return redisTemplate;
+    }
+
+    @Bean
+    public WeatherCacheServiceImpl weatherCacheServiceImpl(RedisTemplate<String, Object> redisTemplate) {
+        return new WeatherCacheServiceImpl(redisTemplate);
+    }
 }

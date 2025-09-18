@@ -8,20 +8,24 @@ import com.weather.info.model.WeatherResponseVO;
 import com.weather.info.model.enums.SupportedDatePatterns;
 import com.weather.info.model.open.weather.OpenWeatherCoordinatesResponseVO;
 import com.weather.info.model.open.weather.OpenWeatherResponseVO;
+import com.weather.info.redis.service.Impl.WeatherCacheServiceImpl;
 import com.weather.info.repository.PincodeRepository;
 import com.weather.info.repository.WeatherRepository;
 import com.weather.info.service.OpenWeatherService;
 import com.weather.info.service.WeatherService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 import java.time.LocalDate;
 import java.util.Optional;
+import java.util.concurrent.TimeUnit;
 
 /**
- *       WeatherServiceImpl is a concrete implementation of WeatherService interface and provides implementation of the
- *       methods in WeatherService.
+ * WeatherServiceImpl is a concrete implementation of WeatherService interface and provides implementation of the
+ * methods in WeatherService.
  */
 @RequiredArgsConstructor
+@Slf4j
 public class WeatherServiceImpl implements WeatherService {
 
     /**
@@ -42,6 +46,8 @@ public class WeatherServiceImpl implements WeatherService {
      */
     private final OpenWeatherService openWeatherService;
 
+    private final WeatherCacheServiceImpl weatherCacheServiceImpl;
+
     private double toCelcius(double temperature) {
         return temperature - 273.15;
     }
@@ -50,38 +56,56 @@ public class WeatherServiceImpl implements WeatherService {
     public WeatherResponseVO getWeatherInformation(long pincode, String date) {
         LocalDate parsedDate = parseDate(date);
         validateDate(parsedDate);
+        String cacheKey = pincode + "::" + parsedDate;
+        WeatherResponseVO cachedResponse = checkDataFromCache(cacheKey);
+        if (cachedResponse != null) {
+            return cachedResponse;
+        }
         Optional<PincodeEntity> pincodeEntity = pincodeRepository.findByPincode(pincode);
         if (pincodeEntity.isPresent()) {
             Optional<WeatherEntity> weatherEntity = weatherRepository.findByPincodeAndDate(pincodeEntity.get(),
                     parsedDate);
-            return weatherEntity.map(entity -> toWeatherResponseVO(entity, pincode))
+            log.info("Fetching from DB for pincode: " + pincode + " and date: " + parsedDate);
+            WeatherResponseVO weatherResponseVO = weatherEntity.map(entity -> toWeatherResponseVO(entity, pincode))
                     .orElseGet(() -> {
                         verifyDate(parsedDate);
                         return fetchAndSaveWeatherInformation(pincodeEntity.get());
                     });
+            weatherCacheServiceImpl.saveWeatherInfo(cacheKey, weatherResponseVO, 10, TimeUnit.HOURS);
+            return weatherResponseVO;
         }
         verifyDate(parsedDate);
         PincodeEntity pincodeEntityWithCoordinates = createPincodeWithCoordinates(pincode);
-        return fetchAndSaveWeatherInformation(pincodeEntityWithCoordinates);
+        WeatherResponseVO weatherResponseVO = fetchAndSaveWeatherInformation(pincodeEntityWithCoordinates);
+        weatherCacheServiceImpl.saveWeatherInfo(cacheKey, weatherResponseVO, 10, TimeUnit.HOURS);
+        return weatherResponseVO;
     }
 
     private void validateDate(LocalDate date) {
         if (date.isAfter(LocalDate.now())) {
+            log.warn("Invalid future date requested: {}", date);
             throw new RuntimeException("Please, provide a valid date");
         }
     }
 
+    private WeatherResponseVO checkDataFromCache(String key) {
+        return weatherCacheServiceImpl.getWeatherInfo(key);
+    }
+
     private void verifyDate(LocalDate date) {
         if (!date.isEqual(LocalDate.now())) {
+            log.warn("No historical data is found for date: " + date);
             throw new ResourceNotFoundException("Weather details not found for date: " + date);
         }
     }
 
     private WeatherResponseVO fetchAndSaveWeatherInformation(PincodeEntity pincodeEntity) {
         OpenWeatherResponseVO openWeatherResponseVO = openWeatherService.getWeatherForPincode(pincodeEntity);
+        log.info("Fetching from Open Weather API : " + openWeatherResponseVO);
         WeatherEntity weatherEntity = toEntity(openWeatherResponseVO);
         weatherEntity.setPincode(pincodeEntity);
         weatherRepository.save(weatherEntity);
+        log.info("Saving weather information to DB and Cache for pincode" + weatherEntity.getPincode() + "and date : " + weatherEntity.getDate());
         return toWeatherResponseVO(weatherEntity, pincodeEntity.getPincode());
     }
 
