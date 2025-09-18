@@ -78,7 +78,7 @@ loadScripts(document, 'script');</script>
 <hr>
 <div class="type-signature"><span class="modifiers">public interface </span><span class="element-name type-name-label">WeatherService</span></div>
 <div class="block">WeatherService is a interface for the service layer of this application.
-      This class is responsible to fetch weather information from OpenWeather API and store it in RDBMS.</div>
+      This class is responsible to fetch weather information from OpenWeather API and store it in RDBMS and redis.</div>
 </section>
 <section class="summary">
 <ul class="summary-list">
@@ -97,7 +97,7 @@ loadScripts(document, 'script');</script>
 <div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#getWeatherInformation(long,java.lang.String)" class="member-name-link">getWeatherInformation</a><wbr>(long&nbsp;pincode,
  <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;date)</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">
-<div class="block">This method is responsible to fetch weather information from OpenWeatherAPI and store it in RDBMS.</div>
+<div class="block">This method is responsible to fetch weather information from OpenWeatherAPI and store it in RDBMS and redis.</div>
 </div>
 </div>
 </div>
@@ -118,10 +118,10 @@ loadScripts(document, 'script');</script>
 <h3>getWeatherInformation</h3>
 <div class="member-signature"><span class="return-type"><a href="../model/WeatherResponseVO.html" title="class in com.weather.info.model">WeatherResponseVO</a></span>&nbsp;<span class="element-name">getWeatherInformation</span><wbr><span class="parameters">(long&nbsp;pincode,
  <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;date)</span></div>
-<div class="block">This method is responsible to fetch weather information from OpenWeatherAPI and store it in RDBMS.
+<div class="block">This method is responsible to fetch weather information from OpenWeatherAPI and store it in RDBMS and redis.
  This method also performs internal sanity checks on the given input parameters.
- Returns Weather information from db if already exists in db or fetches, stores and returns the information by
- calling OpenWeatherAPI.</div>
+ Returns Weather information from db or redis if already exists in db, else fetches, stores and returns the
+ information by calling OpenWeatherAPI.</div>
 <dl class="notes">
 <dt>Parameters:</dt>
 <dd><code>pincode</code> - pincode represents the zip code for which the weather information needs to be fetched</dd>

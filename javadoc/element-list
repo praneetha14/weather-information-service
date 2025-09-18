@@ -7,6 +7,8 @@ com.weather.info.model.enums
 com.weather.info.model.open.weather
 com.weather.info.model.open.weather.utils
 com.weather.info.properties
+com.weather.info.redis.service
+com.weather.info.redis.service.Impl
 com.weather.info.repository
 com.weather.info.rest.v1
 com.weather.info.service

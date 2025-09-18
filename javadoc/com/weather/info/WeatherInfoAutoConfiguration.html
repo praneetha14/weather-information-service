@@ -116,14 +116,24 @@ loadScripts(document, 'script');</script>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="service/OpenWeatherService.html" title="interface in com.weather.info.service">OpenWeatherService</a></code></div>
 <div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#openWeatherService(com.weather.info.client.OpenWeatherClient)" class="member-name-link">openWeatherService</a><wbr>(<a href="client/OpenWeatherClient.html" title="class in com.weather.info.client">OpenWeatherClient</a>&nbsp;openWeatherClient)</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>org.springframework.data.redis.connection.RedisConnectionFactory</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#redisConnectionFactory()" class="member-name-link">redisConnectionFactory</a>()</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>org.springframework.data.redis.core.RedisTemplate&lt;<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>,<wbr><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Object.html" title="class or interface in java.lang" class="external-link">Object</a>&gt;</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#redisTemplate(org.springframework.data.redis.connection.RedisConnectionFactory)" class="member-name-link">redisTemplate</a><wbr>(org.springframework.data.redis.connection.RedisConnectionFactory&nbsp;redisConnectionFactory)</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>org.springframework.web.client.RestTemplate</code></div>
 <div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#restTemplate()" class="member-name-link">restTemplate</a>()</code></div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="service/WeatherService.html" title="interface in com.weather.info.service">WeatherService</a></code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#weatherService(com.weather.info.repository.WeatherRepository,com.weather.info.repository.PincodeRepository,com.weather.info.service.OpenWeatherService)" class="member-name-link">weatherService</a><wbr>(<a href="repository/WeatherRepository.html" title="interface in com.weather.info.repository">WeatherRepository</a>&nbsp;weatherRepository,
- <a href="repository/PincodeRepository.html" title="interface in com.weather.info.repository">PincodeRepository</a>&nbsp;pincodeRepository,
- <a href="service/OpenWeatherService.html" title="interface in com.weather.info.service">OpenWeatherService</a>&nbsp;openWeatherService)</code></div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="redis/service/Impl/WeatherCacheServiceImpl.html" title="class in com.weather.info.redis.service.Impl">WeatherCacheServiceImpl</a></code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#weatherCacheServiceImpl(org.springframework.data.redis.core.RedisTemplate)" class="member-name-link">weatherCacheServiceImpl</a><wbr>(org.springframework.data.redis.core.RedisTemplate&lt;<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>,<wbr><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Object.html" title="class or interface in java.lang" class="external-link">Object</a>&gt;&nbsp;redisTemplate)</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="service/WeatherService.html" title="interface in com.weather.info.service">WeatherService</a></code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#weatherService(com.weather.info.repository.WeatherRepository,com.weather.info.repository.PincodeRepository,com.weather.info.service.OpenWeatherService,com.weather.info.redis.service.Impl.WeatherCacheServiceImpl)" class="member-name-link">weatherService</a><wbr>(<a href="repository/WeatherRepository.html" title="interface in com.weather.info.repository">WeatherRepository</a>&nbsp;weatherRepository,
+ <a href="repository/PincodeRepository.html" title="interface in com.weather.info.repository">PincodeRepository</a>&nbsp;pincodeRepository,
+ <a href="service/OpenWeatherService.html" title="interface in com.weather.info.service">OpenWeatherService</a>&nbsp;openWeatherService,
+ <a href="redis/service/Impl/WeatherCacheServiceImpl.html" title="class in com.weather.info.redis.service.Impl">WeatherCacheServiceImpl</a>&nbsp;weatherCacheServiceImpl)</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
 </div>
 </div>
 </div>
@@ -178,12 +188,13 @@ loadScripts(document, 'script');</script>
 </section>
 </li>
 <li>
-<section class="detail" id="weatherService(com.weather.info.repository.WeatherRepository,com.weather.info.repository.PincodeRepository,com.weather.info.service.OpenWeatherService)">
+<section class="detail" id="weatherService(com.weather.info.repository.WeatherRepository,com.weather.info.repository.PincodeRepository,com.weather.info.service.OpenWeatherService,com.weather.info.redis.service.Impl.WeatherCacheServiceImpl)">
 <h3>weatherService</h3>
 <div class="member-signature"><span class="annotations">@Bean
 </span><span class="modifiers">public</span>&nbsp;<span class="return-type"><a href="service/WeatherService.html" title="interface in com.weather.info.service">WeatherService</a></span>&nbsp;<span class="element-name">weatherService</span><wbr><span class="parameters">(<a href="repository/WeatherRepository.html" title="interface in com.weather.info.repository">WeatherRepository</a>&nbsp;weatherRepository,
  <a href="repository/PincodeRepository.html" title="interface in com.weather.info.repository">PincodeRepository</a>&nbsp;pincodeRepository,
- <a href="service/OpenWeatherService.html" title="interface in com.weather.info.service">OpenWeatherService</a>&nbsp;openWeatherService)</span></div>
+ <a href="service/OpenWeatherService.html" title="interface in com.weather.info.service">OpenWeatherService</a>&nbsp;openWeatherService,
+ <a href="redis/service/Impl/WeatherCacheServiceImpl.html" title="class in com.weather.info.redis.service.Impl">WeatherCacheServiceImpl</a>&nbsp;weatherCacheServiceImpl)</span></div>
 </section>
 </li>
 <li>
@@ -191,6 +202,27 @@ loadScripts(document, 'script');</script>
 <h3>openAPI</h3>
 <div class="member-signature"><span class="annotations">@Bean
 </span><span class="modifiers">public</span>&nbsp;<span class="return-type">io.swagger.v3.oas.models.OpenAPI</span>&nbsp;<span class="element-name">openAPI</span>()</div>
+</section>
+</li>
+<li>
+<section class="detail" id="redisConnectionFactory()">
+<h3>redisConnectionFactory</h3>
+<div class="member-signature"><span class="annotations">@Bean
+</span><span class="modifiers">public</span>&nbsp;<span class="return-type">org.springframework.data.redis.connection.RedisConnectionFactory</span>&nbsp;<span class="element-name">redisConnectionFactory</span>()</div>
+</section>
+</li>
+<li>
+<section class="detail" id="redisTemplate(org.springframework.data.redis.connection.RedisConnectionFactory)">
+<h3>redisTemplate</h3>
+<div class="member-signature"><span class="annotations">@Bean
+</span><span class="modifiers">public</span>&nbsp;<span class="return-type">org.springframework.data.redis.core.RedisTemplate&lt;<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>,<wbr><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Object.html" title="class or interface in java.lang" class="external-link">Object</a>&gt;</span>&nbsp;<span class="element-name">redisTemplate</span><wbr><span class="parameters">(org.springframework.data.redis.connection.RedisConnectionFactory&nbsp;redisConnectionFactory)</span></div>
+</section>
+</li>
+<li>
+<section class="detail" id="weatherCacheServiceImpl(org.springframework.data.redis.core.RedisTemplate)">
+<h3>weatherCacheServiceImpl</h3>
+<div class="member-signature"><span class="annotations">@Bean
+</span><span class="modifiers">public</span>&nbsp;<span class="return-type"><a href="redis/service/Impl/WeatherCacheServiceImpl.html" title="class in com.weather.info.redis.service.Impl">WeatherCacheServiceImpl</a></span>&nbsp;<span class="element-name">weatherCacheServiceImpl</span><wbr><span class="parameters">(org.springframework.data.redis.core.RedisTemplate&lt;<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>,<wbr><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Object.html" title="class or interface in java.lang" class="external-link">Object</a>&gt;&nbsp;redisTemplate)</span></div>
 </section>
 </li>
 </ul>
