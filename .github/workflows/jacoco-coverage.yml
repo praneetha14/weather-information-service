@@ -24,7 +24,9 @@ jobs:
 
       - name: Install XML tools (for badge generation)
         if: github.ref == 'refs/heads/master'
-        run: sudo apt-get install -y libxml2-utils
+        run: |
+              sudo apt-get update
+              sudo apt-get install -y libxml2-utils
 
       - name: Run Tests and Generate Coverage
         run: |
